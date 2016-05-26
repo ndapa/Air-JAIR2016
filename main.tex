@@ -1,0 +1,181 @@
+\documentclass[jair,twoside,11pt,theapa]{article}
+\usepackage{jair, theapa, rawfonts}
+\usepackage{times}
+\usepackage{latexsym}
+\usepackage{amsmath}
+\usepackage{bbm}
+\usepackage{multirow}
+\usepackage{url}
+\usepackage{color}
+\usepackage{epsfig,url,algorithm,algorithmic,multirow}
+%\usepackage{microtype}
+\usepackage{amssymb}
+
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{varwidth}
+
+\renewcommand{\paragraph}[1]{\noindent\textbf{#1.}}
+
+\newcommand{\squishlist}{
+ \begin{list}{}
+  { \setlength{\itemsep}{0pt}
+     \setlength{\parsep}{3pt}
+     \setlength{\topsep}{3pt}
+     \setlength{\partopsep}{0pt}
+     \setlength{\leftmargin}{3em}
+     \setlength{\labelwidth}{1em}
+     \setlength{\labelsep}{0.5em} } }
+
+\jairheading{x}{year}{x-xx}{m/yy}{m/yy}
+\ShortHeadings{Machine Reading  with High Volume  Memory} 
+{Nakashole \& Mitchell}
+\firstpageno{1}
+
+\begin{document}
+
+\title{Machine Reading   with  High Volume  Memory}
+
+\author{\name  Nakashole \email ndapa@cs.cmu.edu \\
+       \addr Carnegie Mellon University\\
+       5000 Forbes Avenue \\
+		Pittsburgh, PA, 15213
+       \AND
+       \name Tom M Mitchell\email tom.mitchell@cs.cmu.edu \\
+       \addr Carnegie Mellon University\\
+       5000 Forbes Avenue \\
+		Pittsburgh, PA, 15213
+       }
+       
+%\author{}
+
+% For research notes, remove the comment character in the line below.
+% \researchnote
+
+\maketitle
+
+
+\begin{abstract}
+In artificial intelligence, the goal of machine reading is to develop systems that automatically understand natural language text.   
+A key challenge in machine reading  arises from a significant amount information not being explicitly stated  but instead  implied by the text in combination with  background knowledge. This means that machine reading methods that rely on  context alone are inherently limited in their understanding capabilities. In this paper, we advocate and  study machine reading methods that incorporate  comprehensive, high volume world knowledge in their inference mechanisms.
+To this end, we  have developed methods for sentence level machine reading  that make use of  background knowledge.  
+The first method addresses prepositional phrase attachment ambiguity. Our  method  uses  background knowledge within a semi-supervised machine learning algorithm that learns from both labeled and unlabeled data. The approach produced state-of-the-art results on two datasets and  performed significantly better than  a widely used dependency parser. The second method aims to extract relationships from compound nouns.  We have developed a  knowledge-aware method for compound noun analysis, our experiments show that it accurately extracts beliefs from compound nouns.
+
+\end{abstract}
+
+\section{Introduction}
+\label{Introduction}
+Artificial intelligence  researchers have long sought to build systems capable of automatically reading  understanding  natural language text -- machine reading systems. A computer program is said to understand 
+language if it responds appropriately to instructions in natural language. For example, if the task is to read a piece of text and answer questions about it, then a program understands if it outputs the correct answers.  If the task is to translate from one language to another, the program understands if it correctly  translates from the source language to the target language. And if the task is to extract information about which drugs treats which physiological conditions,  the program understands if it finds the correct pairs of drugs and physiological conditions.
+
+Machine reading methods can be characterized based on their awareness of  world knowledge.
+On one extreme end, there are methods that  are oblivious to background knowledge, \textit{reading from scratch methods}. On the opposite  end, there are  knowledge-intensive methods that incorporate comprehensive, high volume world knowledge in their inference mechanisms, \textit{reading with high volume memory}. A key challenge in language understanding is that some information is not explicitly stated in text but it is implied by the text in combination with  background knowledge. For example, if the text states that Alice left a restaurant after a good meal, one can infer, with some probability, that she paid the bill and left a tip. In reference resolution, consider the sentence ``The bee landed on the flower because it wanted pollen.''  If we know that  bees feed on pollen, we can correctly determine that ``it''   refers to the bee and not the flower.  In negation detection, consider the sentence:  ``Things would be different if Microsoft was headquartered in Texas.''  From this sentence alone, a machine reading program might incorrectly extract a belief that  Microsoft is headquartered in Texas. But from the prior knowledge that Microsoft was never headquartered in Texas, we might be able to better detect the negation, in addition to the syntactic cues such as ``if''. Thus, inference over prior knowledge is crucial to  text understanding. When humans read, this kind of inference is natural.  Studies of brain scans of people's brains while reading fiction have found that readers mentally simulate each new situation encountered in a story\cite{conf/emnlp/WehbeVKM14}. Details about actions and
+sensation are captured from the text and integrated with personal knowledge from past experiences. 
+%And therefore,  machine reading methods that read from scratch are inherently limited in what they can understand. 
+
+ In this paper, we  study machine reading methods that leverage a  high volume  memory  of beliefs about the world. 
+In particular, we have developed two methods for sentence level machine reading  that make use of  background knowledge:
+\begin{enumerate}
+
+\item The first method addresses  a difficult case of syntactic ambiguity caused by prepositions. Prepositions  such as ``in'', ``at'', and ``for" express important details about the where, when, and why of relations and events. However, prepositions are major source of syntactic ambiguity and still pose problems in language analysis. In particular, they cause the problem of prepositional phrase attachment ambiguity, which  arises in cases such as  ``she caught the butterfly with the spots" vs. ``she caught the butterfly with the net". In the first case,  the preposition ``with''  modifies the verb ``caught", while in the second case, ``with" modifies the noun ``butterfly". Disambiguating  these two attachments requires knowing that butterflies can have spots,  and that a net is an instrument that can be used for catching. Our  approach  uses this type of knowledge within a semi-supervised machine learning algorithm that learns from both labeled and unlabeled data. The approach produced state-of-the-art results on two datasets and  performed significantly better than  a syntactic parser that most people use in their natural language processing pipelines. 
+ 
+ \item The second method that exploits background knowledge for language understanding extracts relationships from compound nouns such as  ``pro-choice Democratic gubernatorial  candidate  James Florio'', or  ``White  House spokesman Marlin Fitzwater''.  Compound nouns  
+contain a number of challenging compositional phenomena, including implicit relations. Compound nouns mostly consist of adjectives and nouns, they do not contain verbs. That means there are often no lexical commonalities even across compound nouns that express the same relations,  making it difficult to extract beliefs from them. On the other hand, beliefs such as a person's job title, nationality, or stance on a political issue are often expressed using compound nouns. We have developed a  knowledge-aware method for compound noun analysis which accurately extracts relationships from compound nouns.
+ \end{enumerate}
+ 
+% 
+% We highlight the  challenges and  report experimental results for our  machine reading methods that have access to background knowledge which we compare to results of methods that read from scratch.
+
+\subsection{ High Volume Memory}
+By high volume memory we mean storage capable of storing and retrieving   comprehensive world
+knowledge akin to the breadth of  world knowledge   adult human brains have a grasp of. Such a high volume memory, therefore,  contains beliefs
+about the world, the objects in it,   their properties, and  approximate confidence scores for beliefs held.
+
+\paragraph{Knowledge Bases} Towards realizing high volume memories of world knowledge, knowledge base construction projects have accumulated large amounts of beliefs about real world entities  \cite{MitchellCHTBCMG15,suchanek2007yago,Bollacker2008}. Large-scale knowledge bases are populated by applying machine reading methods to  web corpora.  For example, the  Never-Ending
+Language Learner (NELL)  system  has been learning to read the web 24 hours/day for over several years. However,  current machine reading methods have been successful at populating knowledge bases  by means of pattern detection--- a shallow way of machine reading which leverages the redundancy of large corpora to capture language patterns. However, machine readers still lack the ability to fully understand  language. In the pursuit of the much harder goal of language comprehension, knowledge bases present an opportunity for a virtuous circle:  the accumulated knowledge can be used to improve machine readers; in turn, advanced reading methods can be used to populate knowledge bases with beliefs expressed using complex and potentially ambiguous language. There has been little work on making use of knowledge bases in machine reading. \cite{conf/acl/KrishnamurthyM14} introduced a method for  training a joint syntactic
+and semantic parser. Their parser makes use of a knowledge base to produce  logical forms containing knowledge base predicates. However, their use of the knowledge base is limited to unary predicates  to determine  semantic types of concepts. In contrast,  in this paper we make extensive use of  a   knowledge base augmented by linguistic resources and corpus statistics  as the content  of a high volume memory  that our knowledge-aware methods have access to at inference time.
+
+\paragraph{Neural Networks with Long-Term Memory}  Recent years have seen wide use of neural network models  for language understanding. For example neural networks have been applied to the task of answering queries about short stories,  and to the task of language modeling where the task is to predict the next word(s) in a text sequence given the previous
+words \cite{MikolovKBCK10,SundermeyerSN12,WestonCB14,sukhbaatar2015end}. These tasks are  treated as instances of sequence processing, where the sequence consists of sentences or   in the case of language modeling the  sequence consists of  words. A number of studies have explored neural networks that model  long-term  structure in sequences
+using recurrent neural networks (RNNs) including Long short-term memory  (LSTMs ) \cite{hochreiter1997long,atkeson1995memory,graves2013generating}. However, the memory in these models is the state
+of the network which is encoded using latent states and weights. This memory is therefore typically  too small  and  not structured enough
+to  remember facts from the past since background knowledge is compressed into dense vectors.  Additionally, in neural approaches, to retrieve relevant memories, 
+smooth lookups are performed, whereby each memory is scored for its relevance, this may not scale well to the case where a larger memory is required. A notable exception in this line of work  is the work of \cite{WestonCB14} which introduced  memory networks  combining RNN inference with a long-term memory. They applied their models to the  task of answering queries about short stories. However background knowledge in this work is raw text from the story  as opposed to high volume world knowledge.  While they also performed an experiment on a question answering setting with   background knowledge consisting  of 14M  statements stored as (subject, relation, object) triples, this setting  is not a machine reading task but  an information retrieval task since there was no reading required to answer the questions, but only look up to find the triples most relevant to  the question.
+
+
+
+\subsection{Contributions}
+Our main contributions are as follows:
+ 
+\textit{1)~Machine Reading   with  High Volume  Memory:}  We describe the problem of machine reading
+with high volume memory. While the problem of machine reading has attracted a lot of attention in recent years,
+there's been very little work on machine reading with high volume memory. This setting is unique and raises new questions which we study within the context of two problems: prepositional phrase attachment, and compound noun relation extraction. 
+ 
+\textit{2)~Prepositional Phrase Attachment: }  We present  a knowledge-aware method for prepositional phrase attachment.
+Previous  methods largely rely on  corpus statistics. Our approach  draws upon 
+ diverse sources of background knowledge, leading to performance improvements. 
+In addition to training on labeled  data, we also make use of a large amount of unlabeled data. This enhances our method's ability to generalize to diverse data sets. 
+In addition to the standard Wall Street Journal corpus (WSJ)~\cite{Ratnaparkhi1994}, we labeled two new datasets for testing purposes, one from Wikipedia (WKP), and another from the  New York Times Corpus (NYTC). We make  these datasets freely available for future research.  In addition, we have applied our  model to over 4 million 5-tuples of the form $\{n0, v, n1, p, n2\}$, and we also make this dataset  available\footnote{http://rtw.ml.cmu.edu/resources/ppa}.
+Although this work was first published in 
+
+\textit{3)~Compound Noun Analysis: }  We introduce a knowledge-aware method for extracting relations from compound nouns. We collected over 2 million compound nouns from which we learned fine-grained semantic type sequences that express relations from the NELL knowledge base. Our experiments show that the accuracy of relations extracted in this manner is quite high.
+
+
+\subsection{Organization}
+The rest of the paper is organized as follows. We begin by presenting our knowledge-aware methods for machine reading.  Section \ref{ppa} presents our knowledge-aware approach to 
+prepositional phrase attachment ambiguity. Section \ref{nominals} introduces our  knowledge-aware approach to relation extraction from compound nouns. Lastly, Section \ref{conclusions} provides concluding remarks and future directions.
+
+ 
+\input{ppad-intro}
+\input{ppad-relatedwork}
+\input{ppad-methodology}
+\input{ppad-evaluation}
+%\input{events}
+\input{nom-section}
+
+\section{Discussion and Conclusion}\label{conclusions}
+%Our experience with developing machine reading systems with access to high volume
+%memory shows  the promise of this approach. In particular,
+In this paper, we presented results on two cases studies of using background knowledge: firs,t for prepositional phrase attachment ambiguity,  we made  use of several types of relevant background knowledge including binary relations, semantic types, and verb role filler information from VerbNet;  second, we made use semantic types of concepts to extract relations from compound  nouns. While these results show the potential of using high volume memory in machine reading methods,  our experience also suggests there are crucial building blocks
+that need to be in place for this approach to be broadly applicable  to machine reading systems beyond 
+single language constructs such as compound nouns and prepositional phrases: 
+
+\paragraph{Broad Coverage Background Knowledge} The representation of knowledge  found in knowledge bases is suitable for reasoning in machine reading learning mechanisms because it is tied to formal semantics and is typically free of inconsistencies.   However, the mechanisms for building knowledge bases still have coverage limitations. For example, the NELL knowledge graph contains 1.34 facts per entity \cite{conf/emnlp/HegdeT15}.  This knowledge sparsity curtails the performance gains we can obtain from  knowledge-aware features. In the future, it will be beneficial to make use of knowledge-on-demand methods for acquiring knowledge, whereby we can pursue targeted knowledge harvesting at both training and test time as needed by our methods.
+
+
+\paragraph{Learning methods} In this work we have used learning methods that treat the problem as  linear function approximation problem with knowledge-aware features represented by sparse vectors. This representation of background  knowledge is limited due to the constraint of the linear function. One  direction  for future work is to approximate more complex functions that are non-linear, and also to represent our knowledge-aware features as dense vectors.
+
+\paragraph{Context Modeling} 
+Understanding a piece of writing requires not only drawing upon background knowledge, but also upon discourse context.
+Instead of reading each sentence of a document as a self-contained unit,  a machine reading program  needs to keep track of what has been stated in preceding sentences.  This is useful for dealing with  basic language concepts such as entity co-reference, but also for keeping track of  concepts already mentioned. Consider the sentence: ``John saw the girl with the binoculars". In the absence of context, the likely interpretation is that John used the binoculars to see the girl. However, if context suggests that there is a girl in possession of binoculars, the interpretation of the sentence changes. In the current work, we completely ignore context. Therefore, one direction for future work is explore how background knowledge interacts with context.
+
+
+
+
+
+\acks{
+This research was supported by
+DARPA under contract number FA8750-13-2-0005. 
+Any opinions, findings,  conclusions and recommendations expressed in this paper are the authors' and do not necessarily reflect those of the sponsor.
+}
+
+%\appendix
+%\section*{Appendix A. X }
+
+
+\vskip 0.2in
+\nocite{*}
+\bibliographystyle{theapa}
+\bibliography{ppad}
+%\bibliographystyle{theapa}
+
+\end{document}
+
+
+
+
+
+

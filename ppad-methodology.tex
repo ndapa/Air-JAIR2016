@@ -1,0 +1,208 @@
+\begin{table*}[th]
+%
+\centering
+%
+\begin{tabular}{ |l| l|l|l| }
+\hline
+{\bf Feature Type} & {\bf \#} &  {\bf Feature}  & {\bf Example}\\
+\hline
+
+Noun-Noun Binary Relations &  & \textbf{Source: SVOs} & \\ 
+   & F1. &  $svo(n2,v,n1)$  &  For q1; $(net,caught,butterfly)$\\ 
+ % & $svo(t2,v,t1)$  &  For q1; $svo(< device>,caught, <animal>)$\\ 
+& F2. &  $\forall i : \exists sv_{i}o; $  $svo(n1,v_i,n2)$ & For q2; $(butterfly,has,spots)$ \\ 
+%& & & For q2; $(butterfly,can $ $have,spots)$\\ 
+& & & For q2; $(butterfly, can $ $see,spots)$\\ 
+
+   Noun  Semantic Categories  &  &  {\bf Source: $\mathcal{T}$ }  & \\
+                & F3. &  $\forall t_i \in \mathcal{T};$ $isA(n1,t_i)$ & For q1 $isA(butterlfy,animal)$\\ 
+                   & F4. &  $\forall t_i \in \mathcal{T};$  $isA(n2,t_i)$ & For q2 $isA(net,device)$\\ 
+                                                                                                          
+  Verb  Role Fillers & & \textbf{Source: VerbNet} & \\ 
+  & F5. &   $hasRole(n2, r_{i})$ &  For q1; $(net, instrument)$ \\
+%   &  &  &   For q3; $(child, beneficiary)$ \\   
+
+Preposition Relational  &  &  \textbf{Source: $\mathcal{M}$} & \\ 
+  Definitions & F6. & $def(prep,v_i)$ $\forall i :$ &  
+\\ 
+         &  & $\exists sv_{i}o; v_i \in  \mathcal{M}$ $ \wedge$  &  
+       \\ 
+          &  &  $svo(n1,v_i,n2)$  &  For q2;
+                    $def(with,has)$ \\ 
+ % &  &  $svo(n1,v_i,n2)$  & For q2; $(butterfly,can $ $have,spots)$\\  
+ 
+ Discourse Features &  & \textbf{Source: Sentence(s), $\mathcal{T}$} & \\ 
+             & F7. &  $\forall t_i \in \mathcal{T}; isA(n0,t_i)$ &  $n0 \in \{n0, v, n1, p, n2\}$ \\
+             %$isA(n0,t_i)$ & For  $n0 \in \{n0, v, n1, p, n2\}$ \\
+
+Lexical  Features& &  {\bf Source: PP quads} & For q1;\\ 
+& F8.  & $(v, n1, p, n2)$ & $(caught,butterfly,with,net)$ \\
+& F9. & $(v, n1, p)$ & $(caught,butterfly,with)$ \\
+& F10. & $(v, p, n2)$ & $(caught,with,net)$ \\ 
+& F11. & $(n1, p, n2)$ &$(butterfly,with,net)$ \\ 
+& F12.  & $(v,p) $ & $(caught,with)$\\ 
+& F13.  & $(n1,p) $ & $(butterfly,with)$\\ 
+& F14. & $(p,n2) $ & $(with,net)$ \\ 
+   &F15.  &$(p) $ & $(with)$\\  
+\hline
+\end{tabular}
+\caption{Types of  features considered in our experiments. All features have values of 1 or 0.  The PP quads used as running examples are:  $q1=\{caught, butterfly, with, net\}: V$, $q2=\{caught, butterfly, with, spots\}: N$.}
+\label{tab:featurevectors}
+\end{table*}
+   
+ 
+
+\subsection{Methodology} 
+%\highlight{Do not refer to features but rather to feature types.}
+%Attributes, Ownership/Possession
+%[NP’s NP]: Mary’s laptop or car’s wheel  but also Mary’s brother or  France’s political elite, government 's explanation,  Netanyahu 's frosty visit 
+%[NP of NP]:  eyes of the baby, economy of Asia,  but also fact of life, a lot of chances 
+%[NP has/have NP]:  Bob has brown eyes, Bob has a cat, cats have fur, cake has nuts, 
+%[NP is made of NP]: foil made of aluminum 
+%[NP contains/consists of NP]:  wine contains alcohol, water consists of hydrogen
+
+
+
+Our approach consists of first generating features from background knowledge and then training a model to learn with these features.
+%extracted from both labeled and unlabeled data. 
+ The types of features considered in our experiments are  summarized  in Table~\ref{tab:featurevectors}.  The choice of features was motivated by our empirically driven characterization of the problem as follows:
+\begin{table}[h]
+\centering
+\begin{tabular}{p{7cm}}
+\textit{(Verb attach) $\longrightarrow$ v $\langle$has-slot-filler$\rangle$ n2} \\
+\hline
+\textit{(Noun attach a.) $\longrightarrow$ n1 $\langle$described-by$\rangle$ n2}\\
+\textit{(Noun attach b.) $\longrightarrow$ n2 $\langle$described-by$\rangle$ n1}\\
+\end{tabular}
+\label{tbl:example}
+\end{table}
+
+That is, we found that for verb-attaching PPs, $n2$  is usually a role filler for the verb, e.g., the net fills the role of an instrument for the verb $catch$. On the other hand,  for noun-attaching PPs,  one noun describes or elaborates on the other. In particular, we found  two kinds of noun attachments. For the first kind of noun attachment,  the second noun $n2$ describes  the first noun $n1$, for example $n2$ might be  an attribute or property of $n1$, as in   the spots($n2$) are an attribute of the butterfly ($n1$).  And for the second kind of noun attachment, the first noun $n1$ describes the second noun $n2$, as  in the PP quad $\{${\em expect, decline, in, rates}$\}$,  where the PP ``in rates'', attaches to the $noun$. The decline:$n1$ that is expected:$v$ is in the rates:$n2$. We sampled $50$ PP quads from the WSJ dataset and found that every labeling could be explained using our characterization.  
+ We make this labeling available with the rest of the datasets.
+
+
+
+We next describe in more detail how each type of feature is derived from the  background knowledge  in Table~\ref{tab:knowledge}.
+
+We generate boolean-valued features for all the feature types we describe in this section.
+
+\subsubsection{Noun-Noun Binary Relations}
+%This type of knowledge refers to binary relations between pairs of nouns. 
+The noun-noun  binary relation features, F1-2 in Table \ref{tab:featurevectors}, are boolean features   $svo(n1,v_i,n2)$ (where $v_i$ is any verb) and $svo(n2,v,n1)$ (where $v$ is the verb in the PP quad, and the roles of $n2$ and $n1$ are reversed). These features describe diverse semantic relations between pairs of nouns (e.g.,   \textit{butterfly-has-spots},   \textit{clapton-played-guitar}).  To obtain this type of knowledge, we dependency parsed all sentences in the 500 million English web pages of the ClueWeb09 corpus, then extracted subject-verb-object (SVO) triples from these parses, along with the frequency of each SVO triple in the corpus.  The value of any given feature $svo(n1,v_i,n2)$ is defined to be 1 if that SVO triple was found at least $3$ times in these SVO triples, and 0 otherwise.
+
+
+To see why these relations are relevant, let us suppose that  we have  the knowledge that \textit{butterfly-has-spots}, $svo(n1,v_i,n2)$. From this, we can  infer that the PP in $\{caught,butterfly, with, spots\}$ is likely to attach to the noun.   Similarly,  suppose we  know that \textit{net-caught-butterfly}, $svo(n2,v,n1)$. The fact   that a net can be used to catch a butterfly can be used to predict that  the  PP in\\ $\{caught,butterfly, with, net\}$ is likely to attach to the verb.   
+
+\subsubsection{Noun Semantic Categories} 
+
+Noun semantic type features, F3-4, are boolean features   $isA(n1,t_i)$ and $isA(n2,t_i)$ where $t_i$ is a noun category in a noun categorization  scheme   $\mathcal{T}$ such as WordNet classes. 
+Knowledge about semantic types of nouns, for example  that a butterfly is an animal, enables extrapolating predictions to other PP quads that contain nouns of the same type. % For example,  $\{caught,<$$animal$$>, with, spots\}$. 
+We ran experiments with several noun categorizations including WordNet classes,  knowledge base ontological types,  and an unsupervised noun categorization produced by clustering  nouns based on the verbs and adjectives with which they co-occur  (distributional similarity).  
+
+\subsubsection{Verb Role Fillers} 
+The verb role feature, F5, is a boolean feature $hasRole(n2, r_{i})$ where $r_i$ is a role that  $n2$ can fulfill for the verb  $v$ in the PP quad, according to background knowledge. Notice that  if  $n2$ fills a role for the verb, then the PP is a verb attachment.  Consider the quad $\{caught,butterfly, with, net\}$, if we know that  a net can play the role of an \textit{instrument} for the verb \textit{catch}, this suggests a likely verb attachment.  We obtained background knowledge of verbs and their possible roles  from the VerbNet lexical resource ~\cite{KipperKRP08}. 
+From VerbNet we obtained $2,573$ labeled  sentences containing PP quads (verbs in the same VerbNet group are considered synonymous), and the  labeled semantic roles  filled by the second noun $n2$ in the PP quad.  We use these example sentences  to label similar  PP quads, where similarity of PP quads is defined by  verbs from the same VerbNet group. 
+
+%See feature 5 in Table~\ref{tab:featurevectors}.
+
+\subsubsection{Preposition  Definitions}
+The preposition  definition feature, $F6$, is a boolean feature $def(prep,v_i)=1$ $if$ $\exists v_i \in  \mathcal{M}$ $ \wedge$  $svo(n1,v_i,n2)=1$, where $ \mathcal{M}$ is a definition mapping of prepositions to verb phrases.   This mapping defines prepositions, using verbs in our ClueWeb09 derived SVO corpus, in order to capture their senses using verbs; it contains definitions such as \textit{def(with, *) = contains, accompanied by, ... }.   If  ``with" is  used in the  sense of ``contains" , then the PP  is a likely noun attachment, as in $n1$ contains $n2$ in the quad $ate, cookies, with, cranberries$. However, if  ``with" is  used in the sense of  ``accompanied by", then the PP is a likely verb attachment, as in the quad $visted, Paris, with, Sue$.
+
+% when used in conjunction with  binary relation features.
+To obtain the mapping, we took the labeled PP quads (WSJ, \cite{Ratnaparkhi1994}) and computed a ranked list of verbs from SVOs, that appear frequently between  pairs of nouns  for a given preposition.
+ %, for a given attachment site verb(v) or noun(n). 
+ % We obtained a large collection of such mappings.
+ Other   sample mappings are:  \textit{def(for,*)= used for},   \textit{def(in,*)= located in}. Notice that this feature $F6$ is a selective, more targeted version of $F2$.
+ %\textit{f(from,n)= comes from, born in, ...}.
+
+
+
+
+\subsubsection{Discourse and Lexical Features}
+The  discourse feature, $F7$,  is  a boolean feature  $isA(n0,t_i)$, for each noun category $t_i$ found in a noun category ontology  $\mathcal{T}$  such as WordNet semantic types. 
+The context of the PP quad can contain relevant information  for  attachment decisions. We  take into account the noun preceding  a PP quad, in particular, its semantic type. This in effect makes the PP quad into a  PP 5-tuple:  $\{n0, v, n1, p, n2\}$, where the $n0$  provides additional context.
+% See feature $7$ in Table~\ref{tab:featurevectors}.
+
+%\subsection{}
+%\subsubsection{ Features}
+Finally, we  use  lexical features in the form of PP quads, features F8-15.  To overcome sparsity of  occurrences of PP quads, we also use counts of shorter sub-sequences, including  triples, pairs and singles. We only use sub-sequences that contain the preposition, as the preposition has been found to be highly crucial in PP attachment decisions \cite{Collins95}.
+% See features $8-15$ in Table~\ref{tab:featurevectors}.
+   
+\subsection{Disambiguation Algorithm}
+We use the described features to train a  model for  making PP attachment decisions.
+Our goal is to compute $\mathbb{P}(y|x)$,   the probability that the PP $ (p,n2)$ in the tuple $\{v,n1,p,n2\}$ attaches to the  \textit{verb (v)} , $y=1$ or  to the $noun (n1)$, $y=0$, given a feature vector $x$ describing that tuple.
+As input to training the model, we are given a collection of PP quads, $D$ where  $d_i \in \mathcal{D}: d_i=\{v,n1,p,n2\} $. A small subset,
+$D^l \subset \mathcal{D}$   is labeled data, thus for each $d_i \in D^l$ we know the corresponding $y_i$. The  rest of the quads, $D^u$,  are unlabeled, hence their corresponding $y_i$s are unknown.
+%In short, we have a  disjoint partitioning such that $\mathcal{D} = D^l \cup D^u $, where $|D| =N$  or equivalently,   $|D^l \cup D^u| = N$, and $|D^l| << |D^u|$.
+From each PP quad $d_i$, we extract a feature vector $x_i$ according to the feature generation process  discussed earlier.. 
+%Thus we have  feature vectors $\mathcal{X} =\{ x_1, .., x_N\}$.
+
+\subsubsection{Model}
+To  model $\mathbb{P}(y|x)$, there a various possibilities. One could use a generative model (e.g., Naive Bayes) or a discriminative model ( e.g., logistic regression). In our experiments we used both kinds of models, but found the discriminative model performed better. Therefore, we present details only for our discriminative model.  We use the  logistic function: 
+%$\mathbb{P}(y|x, \vec \theta)  =  \frac{e^{\vec \theta x}}{1+ e^{\vec \theta x}}$,
+ \begin{equation*}
+ \mathbb{P}(y|x, \vec \theta)  =  \frac{e^{\vec \theta x}}{1+ e^{\vec \theta x}}
+\end{equation*}
+ where $\vec \theta$  is a vector of model parameters. To estimate these parameters,  we could use the labeled data as training data and  use standard   gradient descent  to minimize the logistic regression cost function. However, we also leverage the unlabeled data.  
+
+ 
+ \subsubsection{Parameter Estimation}
+ To estimate model parameters based on both labeled and unlabeled data, we use an Expectation Maximization (EM) algorithm. 
+% The EM algorithm enables parameter estimation in models with incomplete data. 
+ %In our case, the data is incomplete because the $D^u$ labels are unknown. 
+ EM estimates model parameters that maximize the expected log likelihood of the full (observed and unobserved) data.  
+
+Since we are using a discriminative model, our likelihood function is  a  conditional likelihood function:
+  \begin{align}\label{eqlikelihood}
+  \mathcal{L}(\theta)  &=\sum_{i=1}^{N} \mbox{ln }  \mathbb{P}(y_i|x_i)  \nonumber \\
+     &= \sum_{i=1}^{N}  y_i \theta^{T}x_i - \mbox{ln } (1+ exp ( \theta^{T}x_i)) 
+   \end{align}
+where $i$ indexes over the $N$ training examples.
+  
+  
+
+The  EM algorithm produces parameter estimates that correspond to a local maximum in the expected log likelihood of the data under the posterior distribution of the labels, given by: \\   $\arg\max\limits_{\theta}  E_{p(y|x,\theta)} [ \mbox{ln } \mathbb{P}(y|x,\theta)]$.  In the E-step, we use the current parameters $\theta^{t-1}$ to compute the posterior distribution over the $y$ labels, give by $\mathbb{P}(y|x, \theta^{t-1})$.   We then use this posterior distribution to find the expectation of the log of the complete-data conditional likelihood, this expectation is given by  $\mathcal{Q}({\bf\theta, \theta^{t-1})}$, defined as:
+
+  \begin{align}
+\mathcal{Q}(\theta,  \theta^{t-1})  &=\sum_{i=1}^{N} E_{\theta^{t-1}} [ \mbox{ln } \mathbb{P}(y|x,\theta)]  
+    \end{align}
+
+In the M-step, a new estimate $\theta^t$ is then produced, by maximizing this $Q$ function with respect to $\theta$:
+\begin{equation} \label{empameterupdate}
+{\bf \theta^{t}} =\arg\max\limits_{\theta}\mathcal{Q}({\bf\theta, \theta^{t-1})}
+\end{equation}
+
+EM iteratively computes  parameters $\theta^0, \theta^1, ...\theta^{t}$,  using the above update rule at each iteration $t$, halting when there is no further improvement in the value of the $Q$ function.  Our algorithm is summarized in Algorithm 1.  The M-step solution for $\theta^t$ is obtained using gradient ascent to maximize the $Q$ function.  
+
+ \begin{algorithm}
+ \caption{The EM algorithm  for PP attachment}
+ \label{algorithm}
+ \begin{algorithmic}
+ \STATE \textbf{Input:}  $\mathcal{X}, \mathcal{D} = D^{l} \cup D^{u}$\\
+ %\STATE \textbf{Input:} Prior Knowledge  $\mathcal{K}$ \\
+ \STATE \textbf{Output:} $\theta^{T}$
+ %\STATE  $\mathcal{X} =getFeatureVectors(\mathcal{D})$
+ %\STATE  $\mathcal{X} =\{ x_1, .., x_N\}$
+ \FOR{t = 1 . . . T}
+   \STATE \textbf{E-Step:}
+   \STATE Compute $p(y|x_i, \theta^{t-1})$\\
+   \STATE $x_i: d_i\in D^u$; $p(y|x_i, \vec \theta)  =  \frac{e^{\vec \theta x}}{1+ e^{\vec \theta x}}$  \\
+   \STATE $x_i: d_i \in D^{l}$; $p(y|x_i)= 1$ if  $y=y_i,$ else $0$ \\
+   \STATE \textbf{M-Step:} 
+   \STATE Compute new parameters, $\theta^{t}$\\
+   \STATE ${\bf \theta^{t}}$ $=\arg\max\limits_{\theta}\mathcal{Q}({\bf\theta, \theta^{t-1})}$
+   \vspace{-0.4cm}
+   \begin{multline*}
+    \mathcal{Q}(\theta,  \theta^{t-1})  =\sum_{i=1}^{N}\sum_{y\in\{0,1\}}   p(y|x_i,\theta^{t-1}) \times\\( y\theta^{T}x_i - \mbox {ln}  (1+ exp ( \theta^{T}x_i)) ) 
+   \end{multline*}
+    		
+     \IF{convergence($\mathcal{L}(\theta),  \mathcal{L}(\theta^{t-1}))$}
+     	\STATE \textbf{break}\\
+     \ENDIF
+ \ENDFOR
+ \RETURN $\theta^{T}$
+ \end{algorithmic}
+ \end{algorithm} 
+ 
+ 
+

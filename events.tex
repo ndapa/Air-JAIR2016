@@ -1,0 +1,233 @@
+\section{Event Extraction}
+% Binary relations are well-studied, higher-nary ones are not.
+% 
+
+Developing techniques for higher-nary relation extraction  is a natural next step  after  the well-studied case of binary relations \cite{Auer07,suchanek2007yago,Bollacker2008,Carlson2010,MitchellCHTBCMG15}.  
+  %This has resulted in a triple  fact that many relations are expressed as  assuming that   binary relations are expressed as triples of the form,
+  In the literature, prominent  binary relation extraction methods  are mostly  semi-supervised \cite{Suchanek:2009,Carlson2010} or  unsupervised  \cite{Mausam2012,fader2011identifying}. Semi-supervised methods tend to have higher precision than unsupervised methods and therefore are commonly used to populate knowledge bases  of facts \cite{Nakashole2011,MitchellCHTBCMG15}. In such settings,  relations of interest are predefined, i.e, company acquisitions or  protein-protein interactions.
+However,  in semi-supervised approaches,  one needs to provide seed examples for each relation to bootstrap the extractor. This can be expensive, especially if there are many relations of interest. For ternary relations, hand specifying training instances per relation  requires even more time since each training instance is a triplet of three entities as opposed to a pair of entities for binary relations.  Most people know that Google acquired Youtube but not the dollar amount or the date of the acquisition, and most people know that Hillary Clinton is married to Bill Clinton by not the location or date of their wedding. This makes ternary training data generation  a  time consuming exercise in searching the Web. 
+ 
+In this paper we present a resource  for training  ternary extractors. The resource was generated using a minimally supervised yet  high precision method.
+% method for generating training instances for  ternary relations, which only requires minimal supervision. 
+%Towards this end, we   exploit
+% language structure
+% in building higher-nary relation extractors.
+% much like binary relation extractors have leveraged language structure \cite{Fader2011}.
+%One obvious kind of language construction that extract ternary relations is 
+Our method leverages a very common language construction: prepositional phrases (PPs).   PPs such as  ``in X", ``at Y", and ``for Z" express details about the  \textit{where, when,} and \textit{why}  of  binary relation instances. This makes PPs well-suited to extending binary relations by one more argument, extending them to ternary relations.
+ 
+ Consider the following occurrences of 5-item sequences of the form: N1, V, N2, P, N3; where the Ns are noun phrases,  V is a verb and P is a preposition.
+ \begin{table}[h]
+    \small{
+ \centering
+ \begin{tabular}{p{7cm}}
+ \textit{(1) \textbf{Mercedes-Benz}	bought	\textbf{Chrysler}	for	\textbf{\$40 billion}}\\
+  %\textit{Microsoft	acquired	Chrysler	for	\$500 billion}\\
+   \textit{(2) \textbf{CBS}	bought	\textbf{WCCO}	from	\textbf{General Mills}}\\
+ % \textit{(2)Wolkswagen AG	bought	Auto Union GmbH	from	Daimler Benz}\\
+% \hline
+% \textit{(3) Suzanne Somers	sued	ABC	for	\$ 2,000,000.}\\
+% \textit{(4) Alexandroni Brigade	sued	Teddy Katz	for	libel}\\
+  \hline
+  \textit{(3) \textbf{Joe Lieberman}	endorsed	\textbf{McCain}	for	\textbf{president}}\\
+  \textit{(4) \textbf{The New Yorker}	endorsed	\textbf{Obama}	over	 \textbf{Romney}}\\
+ \end{tabular}
+ \label{tbl:example}
+ }
+ \end{table}
+
+In a large Web extracted corpus, one sees many 5-item sequences similar to each of the 6 types shown above. The verbs and prepositions do not change but the arguments N1-3 change. From a large volume of such occurrences, we can learn templates for populating ternary relations. For example, from many occurrences of tuples of type (1), we can generate the template:   \textit{ \textless organization\textgreater	bought \textless organization\textgreater	for	\textless dollar\_amount\textgreater}. We go further by having labels for all three argument placeholders.  For this particular template the labels are: \textit{AcquisationEventAcquirer, AcquisationEventAcquired, AcquisationEventAmount} for the N0, N1, N3, argument placeholders respectively.
+Similarly, from tuples of type (3), we can generate the template:   \textit{ \textless person\textgreater	endorsed \textless politician\textgreater	for	\textless political\_office\textgreater}. And the corresponding argument labels are: \textit{EndorsementEventEndorser,	EndorsementEventEndorsed,	EndorsementEventOffice}, for the N0, N1, N3 argument placeholders respectively. A triplet of argument labels is considered to be a ternary relation. And matching triplets of entities are considered to be instances of ternary relations.
+
+In summary, the contributions of this paper are twofold:
+
+\textit{1)~ Resource:}  A resource for boostrapping ternary relation extraction. It contains ternary relations and their instances. It also contains templates used to populate ternary relations. We make the data available for future research. It is also attached as supplementary data to this submission.
+%triplets of entities
+% (e.g. ( Joe Kieberman, John McCain, president), labeled with their argument roles for specific ternary relations (e.g, (EndorsementEventEndorser,	EndorsementEventEndorsed,	EndorsementEventOffice)). For each triplet, the resource specifies the template used to generate it.
+
+\textit{2)~ Data Generation Method:} We describe  the approach used to generate this resource, which others can replicate to generate similar resources in their  domains of interest.
+
+ %NEL_organization	endorsed	NEL_person	over	NEL_person
+ 
+% cbs	bought	wcco	from	general mills
+% u.s.	bought	alaska	from	russia
+% olkswagen ag	bought	auto union gmbh	from	daimler benz
+%
+%johnson	acquired	neutrogena	for	$ 924 million
+%microsoft	acquired	hotmail	for	$ 500 million
+%mercedes-benz	buys	chrysler	for	$ 40 billion
+
+%HiringEvent	NEL_organization	appointed	NEL_person	as	NEL_profession	143	HiringEventHirer	HiringEventHiree	HiringEventPosition
+
+% For example, binary extractors have used the assumption that the majority of binary relation types can be expressed by verb phrases. And therefore, prominent binary relation extraction methods extract relation instances by analyzing triples of the form  noun-verbphrase-noun \cite{Fader2011,Nakashole2011,Nakashole:2012:Patty}.
+
+%AcquisitionEvent	NEL_organization	acquired	NEL_person	from	NEL_organization	156	AcquisationEventAcquirer	AcquisationEventAcquired	AcquisationEventSeller
+%AcquisitionEvent	NEL_organization	bought	NEL_organization	for	<nell_amount>	38	AcquisationEventAcquirer	AcquisationEventAcquired	AcquisationEventAmount
+%AttackEvent	NEL_organization	fired	NEL_weapon	at	NEL_organization	37	AttackEventAttacker	AttackEventInstrument	AttackEventAttacked
+%DefeatEvent	NEL_sportsteam	defeated	NEL_sportsteam	in	NEL_event	189	DefeatEventVictor	DefeatEventDefeated	DefeatEventOccasion
+%
+%HiringEvent	NEL_person	appointed	NEL_person	as	NEL_profession	182	HiringEventHirer	HiringEventHiree	HiringEventPosition
+%
+%MeetingEvent	NEL_person	met	NEL_person	in	NEL_location	135	MeetingEventPerson1	MeetingEventPerson2	EventLocation
+%
+%SuingEvent	NEL_person	sued	NEL_organization	for	WDN_discourtesy	22	SuingEventSuer	SuingEventSued	SuingEventReason
+%
+%SuingEvent	NEL_person	sued	NEL_organization	for	<nell_amount>	20	SuingEventSuer	SuingEventSued	SuingEventAmount
+%
+%WeddingEvent	NEL_person	married	NEL_person	in	NEL_location
+%WeddingEvent	NEL_person	married	NEL_person	in	<nell_date>
+
+
+% where the relations of interest are predefined.
+%The way semi-supervised methods work is by starting with a few seed instances for each relation. A large corpora is then used to find sentences which contain these instances, thereby generating training sentences for machine learning classifiers. These classifiers  learn to predict which patterns are good indicators of mentions of seeded relations.
+
+% In the OpenIE and supervised IE, distant supervisio with have been found to be used.
+%  OpenIE, and semi-supervised methods, 
+
+%Boostraping methods are about starting with a few seeds to populate relations. How is boostrapping done.
+%
+% The problem is that  PPs are a major source of  syntactic  ambiguity, they have been found to be causing  most  parsing errors across many parsers (biggest contributor).
+% \highlight{What is the problem caused by PPs? They are usually treated as v p n. Show a tree, with useful ternary relations that can fill a KB. Tell that in the case of V, we have a ternary relation, in the case of N, we have a binary relation}, here we are interested in 5-tuples, not quads.
+% 
+%  In this paper, we study how PPs would affect a PP-based ternary extractor. Would we extract ternary relations that should really be binary relations (assuming V attachment instead of N attachment? ), in the general case, this is expected to be Yes. For the typical verbs that are in knowledge bases, is this an issue?? the answer is yes, because PP exist. So we look into these verbs, in particular, common relations of interest. What happens when we employ typing, we type the arguments. 
+%  
+  
+  \subsection{Related Work}
+  To supervise binary relation extraction methods,  there is an abundance  of resources. Knowledge bases (KBs) such as  DBPedia \cite{Auer07}, YAGO \cite{suchanek2007yago}, Freebase\cite{Bollacker2008}, and NELL \cite{MitchellCHTBCMG15}, as well as Open IE tools and resources such as Reverb \cite{Fader2011}, and Ollie \cite{Mausam2012} contains many millions of binary relation instances that can be used  to distantly train binary relation extraction. However, these knowledge bases are highly impoverished when it comes to ternary relations.  In contrast, we provide a resource that can be used directly to train and encourage more research on the higher-nary machine reading and relation extraction. A number of works have studied temporal scoping of  facts by adding a time dimension to facts \cite{wang2010timely,wijayactp}. While temporal scope generates ternary relations, for example by using reification, this only deals with one type of ternary relation. In contrast, our resource contains $50$ ternary relations, spanning $18$ high level topics or  event types.
+  
+  \begin{table}[t]
+  \begin{tabular}{|l|l|}
+  \hline
+  ElectionEvent & AwardEvent \\
+  HiringEvent & FiringEvent \\
+  AcquisitionEvent & WeddingEvent \\
+  DivorceEvent & DefeatEvent \\
+  MeetingEvent & AttackEvent \\
+  ProductLaunchEvent & EarthquakeEvent \\
+  MurderEvent & PerformingEvent \\
+  SuingEvent & BombingEvent \\
+  EndorsementEvent & ShootingEvent \\
+  \hline
+  \end{tabular}
+  \caption{Event types (18) or high level topics in our resource.  The resource contains 50 ternary relations across these topics.}
+  %For each event type, the method generates relevant ternary relations, as many as can be found in the input raw corpus. We found a total of $50$ ternary relations across the $18$ event types/topics.}
+  \label{eventtypes}
+  \end{table}
+  
+ \subsection{Data Generation}
+In this section we present our method for generating the ternary relations and their instances.
+
+\subsubsection{Input}
+As input, our method takes a natural language text corpus and   high level topics or even types of interest. Our method automatically learns many different ternary relations relevant for each event type. There are two advantages to  specifying event types of interest instead of directly thinking in terms of  ternary relations.  First, a broad event type can capture many relevant ternary relations that naturally appear in the data. Second, it requires much less human effort to specify one event type than manually specifying a list of all conceivable  ternary relations, some of which might not be present in the data.
+
+Table \ref{eventtypes} shows the event types covered in our resource. For each event type, we specified at most three \textit{trigger verbs} that indicate a potential mention of the event type. We will later describe how to automatically extend  event trigger verbs in an iterative manner. This is done in a similar way to extending seed instances or patterns of  binary relations \cite{Suchanek:2009,Nakashole2011,MitchellCHTBCMG15}.
+
+
+
+\subsubsection{Candidate Template Generation} \label{candidates}
+Once we have event types defined with their trigger verbs, we can  generate ternary relations
+for each event type. The first step is to generate ternary relation \textbf{templates}. An example template is: \textit{ \textless person\textgreater	endorsed \textless politician\textgreater	for	\textless political\_office\textgreater}.  We generate these templates directly from the data. We do this by first parsing the raw corpus, and extracting 5-item sequences of the form:  N1, V, N2, P, N3; where the Ns are noun phrases,  V is a verb such that V is a trigger verb of one of the events,  and P is a preposition.
+We generate templates from 5-item sequences as follows: we replace every noun phrase N1-N3 by its semantic type.
+In particular, we do lookups of entity types in two types of semantic hierarchies, WordNet and the NELL type hierarchy \cite{Carlson2010}. We found the two type systems to be complementary: WordNet contains more common nouns whereas NELL contains more proper nouns.
+Our generated templates can therefore contain a mixture of WordNet types and NELL types. For example, for the \textit{MurderEvent}, the following is a valid template that our approach generated: \textit{\textless NEL\_person\textgreater	killed	\textless NEL\_person\textgreater	with	\textless WDN\_weapon\textgreater}. The semantic types in our templates are prefixed by three letters, \textit{NEL} for NELL types, and \textit{WDN} for WordNet types.
+
+We retain, as candidate templates, all the templates of the form:
+\textit{\textless N1\_type\textgreater	V	\textless N2\_type\textgreater	P	\textless N3\_type\textgreater}, whose support size is $>=3$. That is, the template was generated from three or more  5-item sequences, N1, V, N2, P, N3, with distinct noun arguments (N1-N3).
+
+\subsubsection{Template Filtering}\label{filteringandinstances}
+From the candidate templates, a final set of templates is generated.
+To do this, we manually filter out all templates that do not express useful
+ternary relations for the topic at hand. Once we have filtered out the templates, for each
+template, we manually label each template with  descriptive labels for the its corresponding 
+noun phrase placeholders. For example, \textit{\textless NEL\_person\textgreater	killed	\textless NEL\_person\textgreater	with	\textless WDN\_weapon\textgreater} is labeled with \textit{MurderEventMurderer, MurderEventMurdered, MurderEventInstrument}. Each triple of labels is considered to  be a single \textbf{ternary relation}. Therefore we have the ternary relation \textit{Murderer\_Murdered\_Instrument}. Such a ternary relation would  has \textbf{instances} such as \textit{Bob,Alice,knife},  which indicates that Bob murdered Alice with a knife.
+
+We obtain instances of templates, and hence ternary relations, by  retaining the supporting 5-item sequences of each of the accepted templates.
+%The sequences are considered to be \textit{instances} of ternary relations, where each ternary relation
+%is defined by a template
+ Notice that each instance  has labeled noun phrases  because the instances inherit  argument labels from their templates.
+ 
+ 
+It is worth noting that  template filtering is the part requiring the most manual supervision. All the other parts are automated.  While, the specification of event types and their trigger verbs is also manual, it is quite fast, requiring only up to three trigger verbs per event type.  
+
+
+% \highlight{This is now a dataset presentation paper. We make sure that we have no methodology section. Additionally, we present the first dataset, then we present the first dataset plus iteration 1, then first dataset plus first 5 iterations. From each randomly sample 100 templates that were not generated. Tell the people we make available, our templates, and the instances that can be used as training data for higher n-nary systems. Our data set was generation semi-automatically.}
+% The boostrapping approach for binary relations looks like this \cite{Hearst92}.
+% We are interested in 
+ 
+ \subsubsection{Iterative Template Generation} \label{iterate}
+ In order to extend the size of the resource, we  increase the number of trigger verbs per event type. We  do this automatically. First, from the raw data, we extract 5-item sequences of the form $N1, V, N2, AP, N3$. There are two main differences between these sequences and the 5-item sequences we have worked with up to now. First,  here $V$ is any verb, not limited to the trigger verbs that were manually specified. Second, we no longer limit the phrase between $N2$ and $N3$ to prepositional phrases, $P$ is now $AP=any$ $phrase$. We limit the length of $AP$ to a maximum of three words.  
+ We then find 5-item sequences where all three arguments $N1-3$ match the arguments of an instance of a template from Section~\ref{filteringandinstances}.  Thus, we are using the instances generated so far as distant supervision to discover new templates. 
+ 
+ All new $(V,AP)$ pairs forming candidate templates that occur with more than $10$ distinct instances of an existing template qualify  a new promoted  templates. We increase the minimum support required from $3$ to $10$ to avoid introducing noisy templates.
+A new template has  the same argument role labels as the original template whose instances overlap with the instances of the new template.  This process extends the trigger verbs, and is not  limited to prepositions for the extraction of the third argument.   This also allows the generation of more instances from the newly discovered templates. Notice that the number of ternary relations  remain constant from the initial template generation step where we manually label templates with argument roles.
+ %This process also increases the  number of  instances from the new templates.
+ %, as we can use the new template to extract instances of the corresponding ternary relation.
+ % analogous to the case of binary relations \cite{Hearst92}.
+ 
+
+%\section{Resource Quantitative Analysis}
+%We present statistics on the size and quality of the resource,
+%
+%\highlight{1)In resource: trigger verbs.tsv}\\
+%\highlight{2)Iorbittn resource: instances of templates.tsv}\\
+%\highlight{3)In resource: templates only.tsv}\\
+
+
+\subsection{Evaluation}
+We applied our data generation process to  Wikipedia (WKP) and the  ClueWeb09 (CWB) corpus. 
+We first generated an initial set of candidate  templates from Wikipedia, using the method described in Section \ref{candidates}. We did not apply this step to the ClueWeb corpus as it can be noisy. We then manually filtered the generated candidate templates as described in Section \ref{filteringandinstances}. This is  iteration $0$. We had a total of $186$ templates at iteration $0$, and  $50$ ternary relations across $18$ event types.  The number of templates increase across iterations.
+%but the number of ternary relations remain the same.
+ Therefore, in subsequent iterations, we obtain more templates that can be used to populate our $50$ ternary relations. 
+
+ From the  initial templates, we generate template instances both from Wikipedia and the ClueWeb corpus. These are triples of entities whose types match the argument types of the template, and they occur with the lexical items that appear in the template. We then use the instances as distant supervision to generate more templates as described in Section \ref{iterate}. Again, we only discover new templates from Wikipedia, using only ClueWeb to find instances for the discovered templates. At iteration 1, we discovered an additional 174 templates.
+ 
+ Our method picked up new templates until iteration 3, making a total of $502$ templates. Figure \ref{fig:templates} shows the cumulative number of templates across iterations. Also shown in Figure \ref{fig:templates}  is precision of templates.  We manually assessed precision at every iteration, we did this by randomly selecting $100$ templates discovered at every iteration, or all templates if less than $100$ templates were discovered in a given iteration. Precision is $100$\%  at all iterations, except for iteration 2 where it dropped to $95$\%. 
+This was due to a   few cases of semantic drift not being cutoff by thresholds of our methods. This led our method do discover templates with verbs such as ``resigned as" in templates associated with \textit{hiring} events, we marked these as wrong.
+
+Figure \ref{candidates} shows the cumulative number of instances picked up at every iteration. We started with $31,161$ from WKP and CWB corpora at iteration $0$ and ended up with $61,380$ instances  by the third and final iteration. This number could be increased by 1) allowing discovery of templates from the ClueWeb corpus or other large corpora 2) lowering the high thresholds on the minimum support size of learned templates .
+Since  instances are generated from templates, their precision can be   inferred from the precision of the templates. To a small extent, instances can also contains errors  stemming  from:  noun phrase chunking and  semantic types; these  errors can be fixed by using  accurate better chunkers  and semantic typing systems.
+% For each instance, we keep track of the template(s) that were used to generate it.
+
+\begin{figure}[t]
+ %
+ \centering
+ %
+ \includegraphics[width=0.80\columnwidth] {template-precision.pdf}
+ \vspace*{-0.98cm}
+ \caption{Precision and accumulated number of learned templates, iterations $0-3$}
+ \label{fig:templates}
+ %
+ \end{figure}  
+ 
+
+ \begin{figure}[t]
+  %
+  \centering
+  %
+  \includegraphics[width=0.80\columnwidth] {instance-recall.pdf}
+  \vspace*{-0.4cm}
+  \caption{Accumulated number  of instances.}
+  \label{fig:instances}
+  %
+  \end{figure}  
+%
+%\begin{itemize}
+%\item First look at performance when the arguments of the  PPs are not typed, what happens 
+%when we just say verb, P, N1, N2: when the verbs are not typed.
+%\item Second, look at performance when the 
+%\end{itemize}
+
+
+%
+%\begin{itemize}
+%\item Prepositional sense disambiguation is not what we are after
+%\item Methods for information extraction from prepositions: Look into this.
+%\item Work in temporal relation extraction can be formulated as ternary relation extraction but it is only one particular type of relation.
+%\item Open IE, still also will suffer from PP.
+%\item Semantic role labeling, the issue is that PPs are ignored in state of the art semantic role labelling such as semafor, and are not adequately tackled.
+%\end{itemize}
+
+
+
+\subsection{Events Summary}
+In this paper our goal is to address the  bottleneck that has throttled research in higher n-ary relation extraction. To this end, we generated a training data resource for ternary relation extractors.  We described a method for learning and populating ternary relations initially only  using prepositional phrase based templates. Additionally, our method  also learns templates that are not based on prepositions, in an iterative manner. We hope this resource  encourages  research on ternary relation extraction. 

@@ -1,0 +1,189 @@
+%
+% File acl2012.tex
+%
+% Contact: Maggie Li (cswjli@comp.polyu.edu.hk), Michael White (mwhite@ling.osu.edu)
+%%
+%% Based on the style files for ACL2008 by Joakim Nivre and Noah Smith
+%% and that of ACL2010 by Jing-Shin Chang and Philipp Koehn
+
+
+\documentclass[11pt,a4paper]{article}
+\renewcommand{\baselinestretch}{1.035}
+\usepackage{acl2014}
+\usepackage{times}
+\usepackage{latexsym}
+\usepackage{amsmath}
+\usepackage{color}
+\usepackage{epsfig,url,algorithm,algorithmic,multirow}
+%\usepackage{microtype}
+\usepackage{amssymb}
+
+
+%for writing 
+%\usepackage{amsfonts}
+%\usepackage{amssymb}
+%\usepackage{calligra}
+%\usepackage{calrsfs}
+%\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+%\usepackage[mathscr]{euscript}
+
+
+%%EXTRA HOME-GROWN MACROS
+
+\newcommand{\tom}[1]{{\color{blue}(TOM: \textit{#1})}}
+%\newcommand{\tom}[1]{{}}
+
+\newcommand{\squishlist}{
+ \begin{list}{$\bullet$}
+  { \setlength{\itemsep}{0pt}
+     \setlength{\parsep}{3pt}
+     \setlength{\topsep}{3pt}
+     \setlength{\partopsep}{0pt}
+     \setlength{\leftmargin}{1.5em}
+     \setlength{\labelwidth}{1em}
+     \setlength{\labelsep}{0.5em} } }
+
+\newcommand{\squishlisttwo}{
+ \begin{list}{$\bullet$}
+  { \setlength{\itemsep}{0pt}
+     \setlength{\parsep}{0pt}
+    \setlength{\topsep}{0pt}
+    \setlength{\partopsep}{0pt}
+    \setlength{\leftmargin}{2em}
+    \setlength{\labelwidth}{1.5em}
+    \setlength{\labelsep}{0.5em} } }
+
+\newcommand{\squishend}{\end{list}}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newtheorem{definition}{Definition}
+\newtheorem{example}{Example}
+\newtheorem{hypothesis}{Hypothesis}
+%\newtheorem{hypothesis}{Hypothesis}[section]
+\newcommand{\newWord}[1]{\emph{#1}}
+\newcommand{\ignore}[1]{}
+%\newcommand{\comment}[1]{{\color{red}{#1}}}
+\newcommand{\comment}[1]{}
+%\newcommand{\remark}[1]{{\color{red}{#1}}}
+\newcommand{\indented}[1]{
+	\begin{tabbing}
+		blah\=\+\kill
+		\parbox{8cm}{#1}
+	\end{tabbing}
+}
+\renewcommand{\paragraph}[1]{\noindent\textbf{#1.}}
+\newcommand{\ruleline}[1]{\indented{#1}}
+
+
+
+\newcommand{\fact}{{\footnotesize \texttt}}
+\newcommand{\factid}[2]{\emph{#1:} \texttt{#2}}
+\newcommand{\factspo}[3]{{\footnotesize $<$\texttt{#1}, \texttt{#2}, \texttt{#3}$>$}}
+\newcommand{\factidspo}[4]{\emph{#1:} \texttt{#2} \texttt{#3} \texttt{#4}}
+\newcommand{\spotl}[1]{\texttt{<#1>}}
+\newcommand{\spotlfive}[5]{$\langle$\texttt{#1}, \texttt{#2}, \texttt{#3}, [\texttt{#4}], $\mathtt{#5}\rangle$}
+\newcommand{\entity}[1]{{\footnotesize \texttt{#1}}}
+%\newcommand{\entity}{{\footnotesize \texttt}}
+\newcommand{\rel}[1]{{\footnotesize \texttt{#1}}}
+
+\newcommand{\instance}[1]{\textit{$\langle$#1$\rangle$}}
+\newcommand{\pos}[1]{\textit{#1}}
+\newcommand{\pattern}[1]{\textit{#1}}
+\newcommand{\str}[1]{``#1''}
+\newcommand{\svo}{\pattern{{\instance{S}}V{\instance{O}}}}
+
+
+\newcommand{\unimportant}[1]{#1}
+%\newcommand{\unimportant}[1]{}
+
+\newcommand{\word}[1]{``#1''}
+
+%%%%%%%%%%%% system
+\newcommand{\sellname}{Prepper}
+
+\newcommand{\highlight}[1]{{\color{red} #1}}
+
+%\usepackage{acl-hlt2011}
+\usepackage{times}
+\usepackage{latexsym}
+\usepackage{amsmath}
+\usepackage{bbm}
+\usepackage{multirow}
+\usepackage{url}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{varwidth}
+
+
+
+% take from http://tex.stackexchange.com/questions/40283/wrapping-table-column-headings-in-turn-environment
+\newcommand{\turn}[3][10em]{% \turn[<width>]{<angle>}{<stuff>}
+  \rlap{\rotatebox{#2}{\begin{varwidth}[t]{#1}#3\end{varwidth}}}%
+}
+
+\title{A Knowledge-Intensive Model for Prepositional Phrase Attachment}
+
+%\title{A Knowledge-Intensive Model for\\ Extracting Information from  Prepositional Phrases}
+%\tom{\\ A Knowledge-Intensive Model for Prepositional Phrase Attachment} \\
+%\tom{\\ A Knowledge-Intensive Model for Reading Prepositional Phrases}}
+
+\author{Ndapandula Nakashole \\
+  Carnegie Mellon University \\
+  5000 Forbes Avenue \\
+  Pittsburgh, PA, 15213 \\
+  {\tt ndapa@cs.cmu.edu} \\\And
+  Tom M. Mitchell \\
+  Carnegie Mellon University \\
+  5000 Forbes Avenue \\
+  Pittsburgh, PA, 15213 \\
+  {\tt tom.mitchell@cs.cmu.edu} \\}
+
+\date{}
+
+%\author{
+%\\
+%%  { \small
+%%    email addresses}
+%}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Prepositional phrases (PPs) express crucial information that  knowledge base construction  methods need to extract.  However, PPs are a major source of syntactic ambiguity and  still pose problems in parsing. We present a method 
+ for resolving  ambiguities arising from PPs, making extensive use of   semantic  knowledge from various resources.
+ % obtained by  information extraction techniques, as well as existing lexical resources.
+As training data, we use both labeled and unlabeled data,  utilizing an expectation maximization algorithm for parameter estimation.  Experiments show that our method yields improvements over existing methods including a state of the art dependency parser.
+
+\end{abstract}
+
+\input{ppad-intro}
+\input{ppad-relatedwork}
+\input{ppad-methodology}
+\input{ppad-evaluation}
+\section{Conclusion}
+We have presented a knowledge-intensive  approach to prepositional phrase (PP) attachment disambiguation, which is  a type of syntactic ambiguity. Our method incorporates  knowledge about verbs, nouns, discourse, and noun-noun binary relations.   We trained a model using labeled data and unlabeled data, making use of expectation maximization for  parameter estimation.
+% Future work includes using our method in  higher-nary relation extraction.
+Our method can be seen as an example of tapping into a positive feedback loop for machine reading, which has only become possible in recent years due to the progress made by  information extraction and knowledge base construction techniques. That is, using  background  knowledge from existing  resources to read better in order to further populate  knowledge bases with otherwise difficult to extract knowledge.
+As future work, we would like to use our method to extract more than just binary relations.
+\section*{Acknowledgments}
+We thank Shashank Srivastava and  members of the NELL team at CMU for  helpful comments.
+This research was supported by
+DARPA under contract number FA8750-13-2-0005. 
+%Any opinions, findings,  conclusions and recommendations expressed in this paper are the authors' and do not necessarily reflect those of the sponsor
+
+%\bibstyle{acl}
+\clearpage
+\nocite{*}
+\bibliographystyle{acl}
+\bibliography{ppad}
+
+
+\end{document}
+
+
